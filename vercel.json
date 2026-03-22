@@ -1,0 +1,8 @@
+{
+  "rewrites": [
+    { "source": "/auth", "destination": "/api/auth" },
+    { "source": "/callback", "destination": "/api/callback" },
+    { "source": "/auth-status", "destination": "/api/auth-status" },
+    { "source": "/generate", "destination": "/api/generate" }
+  ]
+}

@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Dataro — Onboarding</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg:       #0f0f0f;
+    --surface:  #1a1a1a;
+    --border:   #2a2a2a;
+    --accent:   #c8f064;
+    --text:     #f0ede6;
+    --muted:    #888;
+    --radius:   12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 300;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  header {
+    width: 100%;
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .logo {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.4rem;
+    letter-spacing: -0.02em;
+  }
+  .logo span { color: var(--accent); }
+
+  #auth-btn {
+    background: var(--accent);
+    color: #111;
+    border: none;
+    padding: 10px 22px;
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: opacity .2s;
+  }
+  #auth-btn:hover { opacity: 0.85; }
+  #auth-btn.signed-in { background: var(--surface); color: var(--accent); border: 1px solid var(--accent); }
+
+  main {
+    width: 100%;
+    max-width: 680px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 40px 24px 120px;
+    gap: 16px;
+  }
+
+  /* ── Chat bubbles ── */
+  .bubble {
+    max-width: 90%;
+    padding: 16px 20px;
+    border-radius: var(--radius);
+    line-height: 1.6;
+    font-size: 0.97rem;
+    animation: fadeUp .3s ease both;
+  }
+  @keyframes fadeUp {
+    from { opacity:0; transform: translateY(10px); }
+    to   { opacity:1; transform: translateY(0); }
+  }
+
+  .bubble.bot {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    align-self: flex-start;
+    border-bottom-left-radius: 4px;
+  }
+  .bubble.user {
+    background: var(--accent);
+    color: #111;
+    align-self: flex-end;
+    border-bottom-right-radius: 4px;
+    font-weight: 500;
+  }
+
+  /* ── Options buttons ── */
+  .options {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    align-self: flex-start;
+    animation: fadeUp .3s ease both;
+  }
+  .opt-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text);
+    padding: 10px 18px;
+    border-radius: 99px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.88rem;
+    cursor: pointer;
+    transition: all .15s;
+  }
+  .opt-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+  /* ── Input area ── */
+  #input-area {
+    position: fixed;
+    bottom: 0;
+    left: 0; right: 0;
+    background: linear-gradient(to top, var(--bg) 70%, transparent);
+    padding: 20px 24px 32px;
+    display: flex;
+    justify-content: center;
+  }
+  #input-wrap {
+    width: 100%;
+    max-width: 680px;
+    display: flex;
+    gap: 10px;
+    align-items: flex-end;
+  }
+  #text-input {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: var(--radius);
+    padding: 14px 18px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    resize: none;
+    outline: none;
+    transition: border-color .2s;
+    min-height: 52px;
+    max-height: 140px;
+  }
+  #text-input:focus { border-color: var(--accent); }
+  #text-input::placeholder { color: var(--muted); }
+
+  #send-btn {
+    background: var(--accent);
+    border: none;
+    border-radius: var(--radius);
+    width: 52px; height: 52px;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    transition: opacity .2s;
+    flex-shrink: 0;
+  }
+  #send-btn:hover { opacity: 0.85; }
+  #send-btn svg { width: 20px; height: 20px; }
+
+  /* ── Result card ── */
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--accent);
+    border-radius: var(--radius);
+    padding: 24px;
+    align-self: flex-start;
+    width: 100%;
+    animation: fadeUp .4s ease both;
+  }
+  .result-card h3 {
+    font-family: 'DM Serif Display', serif;
+    font-size: 1.1rem;
+    margin-bottom: 8px;
+    color: var(--accent);
+  }
+  .result-card p { color: var(--muted); font-size: 0.88rem; margin-bottom: 16px; }
+  .result-card a {
+    display: inline-block;
+    background: var(--accent);
+    color: #111;
+    text-decoration: none;
+    padding: 10px 22px;
+    border-radius: 99px;
+    font-size: 0.88rem;
+    font-weight: 500;
+    transition: opacity .2s;
+  }
+  .result-card a:hover { opacity: 0.85; }
+
+  .typing { color: var(--muted); font-size: 0.88rem; padding: 8px 0 0 4px; align-self: flex-start; }
+
+  #not-auth-warning {
+    background: #2a1a00;
+    border: 1px solid #5a3a00;
+    color: #ffb347;
+    padding: 14px 20px;
+    border-radius: var(--radius);
+    font-size: 0.88rem;
+    align-self: flex-start;
+    display: none;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">Dataro <span>Onboarding</span></div>
+  <button id="auth-btn" onclick="handleAuth()">Sign in with Google</button>
+</header>
+
+<main id="chat"></main>
+
+<div id="input-area">
+  <div id="input-wrap">
+    <textarea id="text-input" placeholder="Type your answer…" rows="1"
+      onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendText();}"></textarea>
+    <button id="send-btn" onclick="sendText()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="22" y1="2" x2="11" y2="13"></line>
+        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+      </svg>
+    </button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────────
+// State
+// ─────────────────────────────────────────────────
+let authenticated = false;
+let templateType  = null;   // 'offer' | 'contractor'
+let answers       = {};
+let optionalBlocks = {};
+let stepIndex     = 0;
+let steps         = [];
+
+// ─────────────────────────────────────────────────
+// Auth
+// ─────────────────────────────────────────────────
+async function checkAuth() {
+  const res  = await fetch('/auth-status');
+  const data = await res.json();
+  authenticated = data.authenticated;
+  const btn = document.getElementById('auth-btn');
+  if (authenticated) {
+    btn.textContent = '✓ Connected to Google';
+    btn.classList.add('signed-in');
+    startFlow();
+  } else {
+    addBot("Welcome! To get started, please sign in with Google so I can create documents in your Drive.");
+    setTimeout(() => addBot("Click <strong>Sign in with Google</strong> in the top right, then come back here."), 600);
+  }
+}
+
+function handleAuth() {
+  if (!authenticated) window.location.href = '/auth';
+}
+
+// ─────────────────────────────────────────────────
+// Chat helpers
+// ─────────────────────────────────────────────────
+const chat = document.getElementById('chat');
+
+function addBot(html, delay = 0) {
+  return new Promise(resolve => {
+    setTimeout(() => {
+      const div = document.createElement('div');
+      div.className = 'bubble bot';
+      div.innerHTML = html;
+      chat.appendChild(div);
+      scrollBottom();
+      resolve();
+    }, delay);
+  });
+}
+
+function addUser(text) {
+  const div = document.createElement('div');
+  div.className = 'bubble user';
+  div.textContent = text;
+  chat.appendChild(div);
+  scrollBottom();
+}
+
+function addOptions(opts, onPick) {
+  const wrap = document.createElement('div');
+  wrap.className = 'options';
+  wrap.id = 'options-wrap';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'opt-btn';
+    btn.textContent = o.label;
+    btn.onclick = () => { wrap.remove(); onPick(o); };
+    wrap.appendChild(btn);
+  });
+  chat.appendChild(wrap);
+  scrollBottom();
+}
+
+function removeOptions() {
+  const w = document.getElementById('options-wrap');
+  if (w) w.remove();
+}
+
+function scrollBottom() {
+  window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+}
+
+function showInput(show = true) {
+  document.getElementById('input-area').style.display = show ? 'flex' : 'none';
+}
+
+// ─────────────────────────────────────────────────
+// Flow
+// ─────────────────────────────────────────────────
+function startFlow() {
+  addBot("Hi! 👋 I'll help you generate an onboarding document. Which type do you need?", 300);
+  setTimeout(() => {
+    addOptions([
+      { label: '📄 Offer Letter + PIIA', value: 'offer' },
+      { label: '🤝 Consulting Agreement', value: 'contractor' }
+    ], pickTemplate);
+  }, 700);
+  showInput(false);
+}
+
+function pickTemplate(opt) {
+  templateType = opt.value;
+  addUser(opt.label);
+  answers = {};
+  optionalBlocks = {};
+  steps = templateType === 'offer' ? buildOfferSteps() : buildContractorSteps();
+  stepIndex = 0;
+  setTimeout(() => runStep(), 400);
+}
+
+function runStep() {
+  if (stepIndex >= steps.length) {
+    return generateDoc();
+  }
+  const step = steps[stepIndex];
+  showInput(false);
+
+  addBot(step.question, 300).then(() => {
+    if (step.type === 'options') {
+      addOptions(step.options, (opt) => {
+        addUser(opt.label);
+        step.onAnswer(opt.value);
+        stepIndex++;
+        setTimeout(runStep, 400);
+      });
+    } else {
+      // free text
+      showInput(true);
+      document.getElementById('text-input').focus();
+      window._currentStep = step;
+    }
+  });
+}
+
+function sendText() {
+  const input = document.getElementById('text-input');
+  const val   = input.value.trim();
+  if (!val) return;
+  input.value = '';
+  input.style.height = 'auto';
+
+  const step = window._currentStep;
+  if (!step) return;
+
+  addUser(val);
+  showInput(false);
+  step.onAnswer(val);
+  stepIndex++;
+  setTimeout(runStep, 400);
+}
+
+// ─────────────────────────────────────────────────
+// Step definitions — Offer Letter
+// ─────────────────────────────────────────────────
+function buildOfferSteps() {
+  return [
+    {
+      question: "What is today's date for the offer letter? (e.g. March 21, 2026)",
+      type: 'text',
+      onAnswer: v => answers['[DATE]'] = v
+    },
+    {
+      question: "What is the employee's full name?",
+      type: 'text',
+      onAnswer: v => { answers['[FULL NAME]'] = v; answers['[FIRST NAME]'] = v.split(' ')[0]; }
+    },
+    {
+      question: "What is the employee's email address?",
+      type: 'text',
+      onAnswer: v => answers['[EMPLOYEE EMAIL]'] = v
+    },
+    {
+      question: "What is the employee's home address?",
+      type: 'text',
+      onAnswer: v => answers['[EMPLOYEE ADDRESS]'] = v
+    },
+    {
+      question: "What is the job title?",
+      type: 'text',
+      onAnswer: v => answers['[TITLE]'] = v
+    },
+    {
+      question: "Who will the employee report to? (e.g. Head of Engineering)",
+      type: 'text',
+      onAnswer: v => answers['[POSITION]'] = v
+    },
+    {
+      question: "Is this a full-time, part-time, or temporary position?",
+      type: 'options',
+      options: [
+        { label: 'Full-time', value: 'full-time (exempt)' },
+        { label: 'Part-time', value: 'part-time' },
+        { label: 'Temporary', value: 'temporary' }
+      ],
+      onAnswer: v => answers['[temporary ][full-time (exempt) / part-time]'] = v
+    },
+    {
+      question: "What is the annual base salary? (numbers only, e.g. 120000)",
+      type: 'text',
+      onAnswer: v => answers['[AMOUNT]'] = Number(v).toLocaleString()
+    },
+    {
+      question: "Will this employee receive an annual bonus?",
+      type: 'options',
+      options: [{ label: 'Yes', value: true }, { label: 'No', value: false }],
+      onAnswer: v => optionalBlocks['annualBonus'] = v
+    },
+    {
+      question: "Will this employee receive a quarterly bonus?",
+      type: 'options',
+      options: [{ label: 'Yes', value: true }, { label: 'No', value: false }],
+      onAnswer: v => optionalBlocks['quarterlyBonus'] = v
+    },
+    {
+      question: "Will this employee receive commissions?",
+      type: 'options',
+      options: [{ label: 'Yes', value: true }, { label: 'No', value: false }],
+      onAnswer: v => {
+        optionalBlocks['commissions'] = v;
+        if (v) {
+          // insert commission plan title question next
+          steps.splice(stepIndex + 1, 0, {
+            question: "What is the name of the commission plan?",
+            type: 'text',
+            onAnswer: val => answers['[TITLE OF COMMISSION PLAN]'] = val
+          });
+        }
+      }
+    },
+    {
+      question: "Is this employee eligible for company benefits?",
+      type: 'options',
+      options: [{ label: 'Yes', value: true }, { label: 'No', value: false }],
+      onAnswer: v => optionalBlocks['benefitsEligible'] = v
+    },
+    {
+      question: "Will this employee receive stock options?",
+      type: 'options',
+      options: [{ label: 'Yes', value: true }, { label: 'No', value: false }],
+      onAnswer: v => {
+        optionalBlocks['stockOptions'] = v;
+        if (v) {
+          // Stock type and plan hardcoded per company policy
+          answers['[TYPE OF STOCK]'] = 'Common';
+          answers['[YEAR AND TITLE OF STOCK PLAN]'] = '2026 Stock Plan';
+          steps.splice(stepIndex + 1, 0,
+            { question: "How many shares will be granted?", type: 'text', onAnswer: val => answers['[NUMBER]'] = val }
+          );
+        }
+      }
+    },
+    {
+      question: "What is the offer expiry date? (e.g. March 28, 2026)",
+      type: 'text',
+      onAnswer: v => answers['[DATE]'] = v   // replaces remaining [DATE] instances
+    },
+    {
+      question: "What is the target start date?",
+      type: 'text',
+      onAnswer: v => answers['[START DATE]'] = v
+    }
+  ];
+}
+
+// ─────────────────────────────────────────────────
+// Step definitions — Contractor
+// ─────────────────────────────────────────────────
+function buildContractorSteps() {
+  return [
+    {
+      question: "What day of the month does the agreement start? (e.g. 21)",
+      type: 'text',
+      onAnswer: v => answers['[DAY]'] = v
+    },
+    {
+      question: "What month? (e.g. March)",
+      type: 'text',
+      onAnswer: v => answers['[MONTH]'] = v
+    },
+    {
+      question: "What year? (e.g. 2026)",
+      type: 'text',
+      onAnswer: v => answers['[YEAR]'] = v
+    },
+    {
+      question: "What is the contractor's full name or company name?",
+      type: 'text',
+      onAnswer: v => answers['[CONSULTANT NAME]'] = v
+    },
+    {
+      question: "What is the fixed term of the contract? (e.g. 6 months — or type N/A for open-ended)",
+      type: 'text',
+      onAnswer: v => answers['[INSERT TERM OR N/A]'] = v
+    },
+    {
+      question: "Please describe the services to be provided:",
+      type: 'text',
+      onAnswer: v => answers['[INSERT SERVICE DESCRIPTION]'] = v
+    },
+    {
+      question: "How will the contractor be paid?",
+      type: 'options',
+      options: [
+        { label: 'Hourly rate', value: 'hourly' },
+        { label: 'Flat fee', value: 'flat' }
+      ],
+      onAnswer: v => {
+        if (v === 'hourly') {
+          steps.splice(stepIndex + 1, 0,
+            { question: "What is the hourly rate? (numbers only, e.g. 150)", type: 'text', onAnswer: val => answers['[HOURLY RATE]'] = val },
+            { question: "What is the maximum cost cap? (numbers only, e.g. 10000)", type: 'text', onAnswer: val => answers['[COSTCAP]'] = Number(val).toLocaleString() }
+          );
+        } else {
+          steps.splice(stepIndex + 1, 0,
+            { question: "What is the flat fee amount? (numbers only)", type: 'text', onAnswer: val => answers['[FIXED FEE]'] = Number(val).toLocaleString() }
+          );
+        }
+      }
+    }
+  ];
+}
+
+// ─────────────────────────────────────────────────
+// Generate document
+// ─────────────────────────────────────────────────
+async function generateDoc() {
+  showInput(false);
+  await addBot("✨ Perfect — generating your document now…", 300);
+
+  try {
+    const res  = await fetch('/generate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ templateType, answers, __optionalBlocks: optionalBlocks })
+    });
+    const data = await res.json();
+
+    if (data.success) {
+      const card = document.createElement('div');
+      card.className = 'result-card';
+      card.innerHTML = `
+        <h3>Document ready!</h3>
+        <p>${data.name} has been created in your Google Drive.</p>
+        <a href="${data.url}" target="_blank">Open in Google Docs →</a>
+      `;
+      chat.appendChild(card);
+      scrollBottom();
+
+      setTimeout(() => {
+        addBot("Need to create another document?", 600);
+        setTimeout(() => {
+          addOptions([
+            { label: '📄 New Offer Letter', value: 'offer' },
+            { label: '🤝 New Consulting Agreement', value: 'contractor' }
+          ], pickTemplate);
+        }, 1000);
+      }, 800);
+    } else {
+      addBot(`❌ Something went wrong: ${data.error}`);
+    }
+  } catch (e) {
+    addBot(`❌ Error: ${e.message}`);
+  }
+}
+
+// ─────────────────────────────────────────────────
+// Auto-resize textarea
+// ─────────────────────────────────────────────────
+document.getElementById('text-input').addEventListener('input', function () {
+  this.style.height = 'auto';
+  this.style.height = this.scrollHeight + 'px';
+});
+
+// ─────────────────────────────────────────────────
+// Boot
+// ─────────────────────────────────────────────────
+checkAuth();
+</script>
+</body>
+</html>
